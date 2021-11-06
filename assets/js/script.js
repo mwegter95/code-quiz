@@ -2,6 +2,8 @@ var startButton = document.querySelector(".start-btn");
 var quizWrapper = document.querySelector(".quiz-wrapper");
 var answerList = document.querySelector(".answer-options");
 questionCounter = 0;
+var min = 2;
+var sec = 0;
 var question = document.querySelector(".question-title");
 var questions = [
     "0", 
@@ -16,8 +18,11 @@ var answerKey = [0, 3, 1 ]
 
 
 var startButtonHandler = function() {
+    // remove startButton and prompt telling you to hit start
     startButton.remove();
     document.querySelector("#start-prompt").remove();
+    // show and start timer
+    quizTimer();
     questionCounter +=1;
     // display first question
     question.textContent = questions[questionCounter];
@@ -32,6 +37,38 @@ var startButtonHandler = function() {
         answerOption.appendChild(answerOptionBtn);
         answerList.appendChild(answerOption);
     }  
+}
+
+var quizTimer = function () {
+    var timerEl = document.createElement("div");
+    timerEl.className = "timer-element"
+    timerEl.innerHTML = "<p>" +"0" + min + ":" + "0" + sec + "</p>"
+    quizWrapper.appendChild(timerEl);
+    timerCycle();
+}
+
+var timerCycle = function() {
+    timerEl = document.querySelector(".timer-element");
+    min = parseInt(min);
+    sec = parseInt(sec);
+    console.log(min);
+    if (sec == 0 && min != 0) {
+        min = min - 1;
+        sec = sec + 59;
+    } else if (sec == 0 && min == 0) {
+        timeIsOut();
+    } else {
+        sec = sec - 1;
+    }
+    if (sec < 10 || sec == 0) {
+        sec = '0' + sec;
+        }
+    if (min < 10 || min == 0) {
+        min = '0' + min;
+    }
+    timerEl.innerHTML = min + ":" + sec;
+    
+    setTimeout("timerCycle()", 1000);
 }
 
 var nextQuestion = function() {
