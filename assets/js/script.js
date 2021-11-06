@@ -4,6 +4,9 @@ var answerList = document.querySelector(".answer-options");
 questionCounter = 0;
 var min = 2;
 var sec = 0;
+var stopTime = false;
+var scoreKeeper = 0;
+var scoreSave = [];
 var question = document.querySelector(".question-title");
 var questions = [
     "0", 
@@ -16,7 +19,7 @@ var answers = [
 var answerKey = [0, 3, 1 ]
 
 
-
+// go from page with start button to first question
 var startButtonHandler = function() {
     // remove startButton and prompt telling you to hit start
     startButton.remove();
@@ -48,27 +51,31 @@ var quizTimer = function () {
 }
 
 var timerCycle = function() {
-    timerEl = document.querySelector(".timer-element");
-    min = parseInt(min);
-    sec = parseInt(sec);
-    console.log(min);
-    if (sec == 0 && min != 0) {
-        min = min - 1;
-        sec = sec + 59;
-    } else if (sec == 0 && min == 0) {
-        timeIsOut();
-    } else {
-        sec = sec - 1;
-    }
-    if (sec < 10 || sec == 0) {
-        sec = '0' + sec;
+
+    if (stopTime == false) {
+        timerEl = document.querySelector(".timer-element");
+        min = parseInt(min);
+        sec = parseInt(sec);
+        if (sec == 0 && min != 0) {
+            min = min - 1;
+            sec = sec + 59;
+        } else if (sec == 0 && min == 0) {
+            timeIsOut();
+        } else {
+            sec = sec - 1;
         }
-    if (min < 10 || min == 0) {
-        min = '0' + min;
-    }
-    timerEl.innerHTML = min + ":" + sec;
-    
-    setTimeout("timerCycle()", 1000);
+        if (sec < 10 || sec == 0) {
+            sec = '0' + sec;
+            }
+        if (min < 10 || min == 0) {
+            min = '0' + min;
+        } 
+        timerEl.innerHTML = min + ":" + sec;
+        
+        setTimeout("timerCycle()", 1000);
+        } else {
+            return;
+        }
 }
 
 var nextQuestion = function() {
@@ -76,7 +83,7 @@ var nextQuestion = function() {
 
         // clear old answers from list and clear previous result
         answerList.innerHTML = "";
-        document.querySelector(".resultWrapper").innerHTML = ""
+        document.querySelector(".result-wrapper").innerHTML = ""
 
         questionCounter += 1;
         question.textContent = questions[questionCounter];
@@ -93,7 +100,6 @@ var nextQuestion = function() {
         }
     } else {
         showScores();
-        return;
     }
 
 }
@@ -101,28 +107,59 @@ var nextQuestion = function() {
 var answerButtonHandler = function(event) {
     if (event.target.matches(".answer-option-btn")) {
         var answerId = event.target.getAttribute("id");
-        console.log(answerId);
+
         if (answerId == answerKey[questionCounter]) {
-            console.log("correct");
-            questionAnswered("Correct, nice!");
+            scoreKeeper += 100;
+            questionAnswered("Correct, nice! +100 pts");
         } else {
-            console.log("incorrect");
-            questionAnswered("Incorrect, darn.")
+            questionAnswered("Incorrect, darn. +0 pts")
         }
         
     }
 }
 
 var questionAnswered = function(msg) {
-    var result = document.createElement("div")
+    result = document.querySelector(".result-wrapper");
+    if (!result) {
+        var result = document.createElement("div")
+    }
     result.innerHTML = "<h3>" + msg + "</h3>";
-    result.className = "resultWrapper";
+    result.className = "result-wrapper";
     quizWrapper.appendChild(result);
     setTimeout(nextQuestion, 1000);
 
 }
 
+var showScores = function() {
+    stopTime = true;
+    console.log(scoreKeeper);
+    // clear old answers from list and clear previous result and clear question
+    answerList.innerHTML = "";
+    var result = document.querySelector(".result-wrapper");
+    result.innerHTML = "";
+    question.innerHTML="";
+
+    // create initials form
+    var initialsForm = document.createElement("form");
+    initialsForm.className = "initials-form"
+    initialsForm.innerHTML = "<input type='text' name='initials' placeholder='Enter your initials'></input>"
+    var formButton = document.createElement("button");
+    formButton.className = "btn";
+    formButton.id = "save-initials";
+    formButton.type = "submit"
+    formButton.textContent = "Save";
+    initialsForm.appendChild(formButton);
+    quizWrapper.appendChild(initialsForm);
+    initialsForm.addEventListener("submit", initialsSubmitHandler);
+
+}
+var initialsSubmitHandler = function(event) {
+    event.preventDefault();
+    console.log("submitted");
+}
+
 
 startButton.addEventListener("click", startButtonHandler);
 quizWrapper.addEventListener("click", answerButtonHandler);
+quizWrapper.addEventListener("submit", initialsSubmitHandler);
 
