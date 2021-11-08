@@ -13,12 +13,20 @@ var question = document.querySelector(".question-title");
 var questions = [
     "0", 
     "What coding language would you use to make a quiz game on the internet?",
-    "What is an example of a conditional?",]
+    "What is an example of a conditional?",
+    "What is the name of the statement that is used to exit or end a loop?",
+    "What kind of statement is used to execute actions based on a trigger or condition?",
+    "In JavaScript, what element is used to store multiple values in a single variable?",
+    "What is a JavaScript element that represents either TRUE or FALSE values?"];
 var answers = [
     ["0"], 
     ["EspressoScript", "CappucinoScript", "MochaScript", "JavaScript"], 
-    ["2a", "If (result > 0)", "2c", "2d"]];
-var answerKey = [0, 3, 1 ]
+    ["<span></span>", "If (result > 0)", "var area = 2", "document.createElement"],
+    ["Break statement", "Close statement", "Conditional Statement", "Falter statement"],
+    ["Conditional statement", "RegExp or RegularExpression", "Boolean variable", "Fired event"],
+    ["Strings", "Variables", "Arrays", "Functions"],
+    ["Event", "Boolean", "Condition", "RegExp"]];
+var answerKey = [0, 3, 1, 0, 0, 2, 1];
 
 
 // go from page with start button to first question
@@ -47,7 +55,7 @@ var startButtonHandler = function() {
 var quizTimer = function () {
     var timerEl = document.createElement("div");
     timerEl.className = "timer-element"
-    timerEl.innerHTML = "<p>" +"0" + min + ":" + "0" + sec + "</p>"
+    timerEl.innerHTML = "<p>" + "0" + min + ":" + "0" + sec + "</p>"
     quizWrapper.appendChild(timerEl);
     timerCycle();
 }
@@ -72,7 +80,7 @@ var timerCycle = function() {
         if (min < 10 || min == 0) {
             min = '0' + min;
         } 
-        timerEl.innerHTML = min + ":" + sec;
+        timerEl.innerHTML = "Quiz Time Remaining: " + min + ":" + sec;
         
         setTimeout("timerCycle()", 1000);
         } else {
