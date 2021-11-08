@@ -7,6 +7,8 @@ var sec = 0;
 var stopTime = false;
 var scoreKeeper = 0;
 var scoreSave = [];
+var scoreSaveOrdered = [];
+var finalPlayerAndScore = [];
 var question = document.querySelector(".question-title");
 var questions = [
     "0", 
@@ -78,6 +80,11 @@ var timerCycle = function() {
         }
 }
 
+var timeIsOut = function () {
+    alert("Your time ran out!");
+    showScores();
+}
+
 var nextQuestion = function() {
     if (questionCounter < (questions.length -1)) {
 
@@ -112,7 +119,8 @@ var answerButtonHandler = function(event) {
             scoreKeeper += 100;
             questionAnswered("Correct, nice! +100 pts");
         } else {
-            questionAnswered("Incorrect, darn. +0 pts")
+            questionAnswered("Incorrect, darn. +0 pts, -20 seconds")
+            sec = sec - 20;
         }
         
     }
@@ -139,10 +147,18 @@ var showScores = function() {
     result.innerHTML = "";
     question.innerHTML="";
 
+    // show the score
+    var showTheScore = document.createElement("span");
+    showTheScore.id = "player-score"
+    var totalScore = scoreKeeper + parseInt(min*60) + parseInt(sec);
+    showTheScore.textContent = "Your score: " + totalScore;
+    var pageContentEl = document.querySelector(".page-content");
+    pageContentEl.appendChild(showTheScore);
+
     // create initials form
     var initialsForm = document.createElement("form");
     initialsForm.className = "initials-form"
-    initialsForm.innerHTML = "<input type='text' name='initials' placeholder='Enter your initials'></input>"
+    initialsForm.innerHTML = "<input id='initials' type='text' name='initials' placeholder='Enter your initials'></input>"
     var formButton = document.createElement("button");
     formButton.className = "btn";
     formButton.id = "save-initials";
@@ -150,12 +166,84 @@ var showScores = function() {
     formButton.textContent = "Save";
     initialsForm.appendChild(formButton);
     quizWrapper.appendChild(initialsForm);
-    initialsForm.addEventListener("submit", initialsSubmitHandler);
+
+
+    // add scores ol
+    var scoresOl = document.createElement("ol");
+    scoresOl.className = "score-display"
+    quizWrapper.appendChild(scoresOl);
+
+    // load scores from localStorage
+    loadHiScores();
+
+    // // show scores that are saved
+    // for (i = 0; i < scoreSave.length; i++) {
+    //     score = scoreSave[i];
+    //     createHiScore(score);
+    // }
 
 }
+
+// logic to add score and initials to scoreSave, then call saveHiScores
 var initialsSubmitHandler = function(event) {
     event.preventDefault();
     console.log("submitted");
+    console.log(event);
+    finalPlayerAndScore[0] = document.querySelector("input[id='initials']").value;
+    finalPlayerAndScore[1] = scoreKeeper + parseInt(min*60) + parseInt(sec);
+    console.log(finalPlayerAndScore);
+    scoreSave.push(finalPlayerAndScore);
+    console.log(scoreSave);
+    scoreSaveOrdered = scoreSave.sort(function(a, b) {
+        return b[1] - a[1];
+    });
+
+    console.log(scoreSaveOrdered);
+    // add call saveHiScores
+    saveHiScores();
+
+    loadHiScores();
+
+}
+
+var saveHiScores = function() {
+    localStorage.setItem("scoreSave", JSON.stringify(scoreSave));
+    console.log("hi-scores saved");
+}
+
+var loadHiScores = function () {
+    var savedScores = (localStorage.getItem("scoreSave"));
+    // if there are no saved scores, return out of function
+    if (!savedScores) {
+        return false;
+    }
+    // else, load up saved scores
+    console.log("Saved scores found!");
+    // parse into array of objects
+    scoreSave = JSON.parse(savedScores);
+    scoreSaveOrdered = scoreSave.sort(function(a, b) {
+        return b[1] - a[1];
+    });
+    var scoresOl = document.querySelector(".score-display")
+    scoresOl.innerHTML = "";
+    // loop through savedScores array and pass to createHiScore 
+    // function to show on page
+    for (var i = 0; i < scoreSaveOrdered.length; i++) {
+        createHiScore(scoreSaveOrdered[i]);
+    }
+
+
+}
+
+var createHiScore = function(score) {
+    var hiScoreEl = document.createElement("li");
+    hiScoreEl.className = "hi-score-li";
+    hiScoreEl.textContent = score[0] + " " + score[1];
+    var scoresOl = document.querySelector(".score-display");
+    scoresOl.appendChild(hiScoreEl);
+
+
+
 }
 
 
